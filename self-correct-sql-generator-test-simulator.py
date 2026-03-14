@@ -11,9 +11,10 @@ import json
 
 load_dotenv()
 
+#Agent State
 class AgentState(TypedDict, total=False):
-    messages: Annotated[Sequence[BaseMessage], add_messages]
-    sql: Optional[str]
+    messages: Annotated[Sequence[BaseMessage], add_messages] #Message trace
+    sql: Optional[str] 
     schema: Optional[str]
     errors: Optional[str]
     user_input: Optional[str]
@@ -25,34 +26,6 @@ def input_node(state: AgentState) -> AgentState:
     human_msg = HumanMessage(content=input)
     return {"messages": [human_msg]}
 
-def generate_sql_node(state: AgentState) -> AgentState:
-    schema = state.get("schema")
-    input = state.get("user_input")
-    user_prompt = "Generate a sql as per the requirement: " +  input + "Here is the DB schema : " + schema
-    if(state.get("errors")):
-        user_prompt = user_prompt + "SQL generated previously " + state.get("sql") + "and the error received" +state.get("errors") + "Make sure the previous error is corrected in the new sql"
-
-    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
-    chat_completion = client.chat.completions.create(
-    messages=[
-        {
-            "role": "system",
-            "content": "You are a SQL expert. Provide your response as a **JSON** object. "
-                    "The JSON must have a single key called 'sql_query' containing the raw SQL code."
-        },
-        {
-            "role": "user",
-            "content": user_prompt
-        }
-    ],
-    response_format={"type":"json_object"},
-    model="llama-3.1-8b-instant") # You can also use "mixtral-8x7b-32768" or "gemma2-9b-it"
-
-    raw_json = json.loads(chat_completion.choices[0].message.content)
-    sql = raw_json.get("sql_query") # Now you have pure SQL from a JSON key
-
-    return {"sql":sql, "messages":[AIMessage(content=f"Generated SQL: {sql}")]}
 
 def chaos_node(state: AgentState):
     # Simulate a syntax error manually
