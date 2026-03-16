@@ -1,3 +1,6 @@
 /.env
 /.venv
 /.vscode
+self-correcting-sql-generator/__pycache__/sql_executor.cpython-313.pyc
+self-correcting-sql-generator/__pycache__/sql_generator.cpython-313.pyc
+self-correcting-sql-generator/__pycache__/state.cpython-313.pyc

@@ -17,7 +17,7 @@ load_dotenv()
 
 #Input node to preprocess input message if required
 def input_node(state: AgentState) -> AgentState:
-    return {"messages": [HumanMessage(content=input)]}
+    return {"messages": [HumanMessage(content=state.get("user_input"))]}
 
 def call_agent(state:AgentState):
     error = state.get("errors")
@@ -52,7 +52,7 @@ user_input = "Who is the customer who spent the most money, and how much did the
 
 state: AgentState={"messages":[], "schema": schema, "user_input" : user_input}
 
-#result = app.invoke(state)
+result = app.invoke(state)
 
 for event in app.stream(state):
     # 'event' is a dictionary where the key is the node name
